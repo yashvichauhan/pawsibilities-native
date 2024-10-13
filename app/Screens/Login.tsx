@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, TextInput, Button, Alert, BackHandler } from 'react-native';
 import { Text, View } from '../../components/Themed';
 
 import { useNavigation } from '@react-navigation/native';  // Import useNavigation
@@ -12,6 +12,22 @@ export default function Login() {
   const navigation = useNavigation();  // Initialize navigation
 
   const { setShowTabBar } = useTabBarVisibility();
+
+  useEffect(() => {
+
+    setShowTabBar(false);
+
+    // Disable hardware back button on Android
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+
+    // Disable swipe back gesture on iOS
+    navigation.setOptions({
+      gestureEnabled: false,  // Disable back navigation via swipe gesture on iOS
+    });
+
+    // Cleanup the event listener on component unmount
+    return () => backHandler.remove();
+  }, [navigation]);
 
   const handleLogin = async () => {
     try {
@@ -72,8 +88,13 @@ export default function Login() {
               secureTextEntry
             />
 
+          <View style={styles.buttonContainer}>
             <Button title="Login" onPress={handleLogin} />
+          </View>
+
+          <View style={styles.buttonContainer}>
             <Button title="Create new account" onPress={handleSignUp} />
+          </View>
             
           </View>
     </View>
@@ -121,5 +142,9 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 15,
     paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    width: '100%',
+    marginVertical: 10,  // Add vertical space between buttons
   },
 });

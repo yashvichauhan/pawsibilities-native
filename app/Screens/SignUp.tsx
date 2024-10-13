@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, TextInput, Button, Alert, TouchableOpacity, BackHandler } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';  // Import useNavigation
 
@@ -11,6 +11,18 @@ export default function SignUp({ path }: { path: string }) {
 
   const navigation = useNavigation();  // Initialize navigation
 
+  useEffect(() => {
+    // Disable hardware back button on Android
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+
+    // Disable swipe back gesture on iOS
+    navigation.setOptions({
+      gestureEnabled: false,  // Disable back navigation via swipe gesture on iOS
+    });
+
+    // Cleanup the event listener on component unmount
+    return () => backHandler.remove();
+  }, [navigation]);
 
   const handleSubmit = async () => {
     // Determine roleId and roleDescription based on the userType
@@ -103,8 +115,13 @@ export default function SignUp({ path }: { path: string }) {
                   secureTextEntry
                 />
 
-                <Button title="Submit" onPress={handleSubmit} />
-                <Button title="Click here to sign in" onPress={handleLogin} />
+                <View style={styles.buttonContainer}>
+                  <Button title="Submit" onPress={handleSubmit} />
+                </View>
+
+                <View style={styles.buttonContainer}>
+                  <Button title="Click here to sign in" onPress={handleLogin} />
+                </View>
               </View>
     </View>
   );
@@ -181,5 +198,9 @@ const styles = StyleSheet.create({
   },
   radioText: {
     fontSize: 16,
+  },
+  buttonContainer: {
+    width: '100%',
+    marginVertical: 10,  // Add vertical space between buttons
   },
 });
