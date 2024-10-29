@@ -8,6 +8,8 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
+import { TabBarProvider } from '@/context/TabBarContext'; // Import the provider
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -42,7 +44,13 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <TabBarProvider>
+          <RootLayoutNav />
+    </TabBarProvider>
+
+
+  );
 }
 
 function RootLayoutNav() {
@@ -53,6 +61,7 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="Screens" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="index" options={{headerBackVisible: false,}} />
       </Stack>
     </ThemeProvider>
   );
