@@ -11,11 +11,12 @@ export default function Login() {
 
   const navigation = useNavigation();  // Initialize navigation
 
-  const { setShowTabBar } = useTabBarVisibility();
+  const { setShowTabBar, setRole } = useTabBarVisibility();
 
   useEffect(() => {
 
     setShowTabBar(false);
+    setRole(null);
 
     // Disable hardware back button on Android
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
@@ -43,6 +44,16 @@ export default function Login() {
       });
 
       if (response.status === 200) {
+        const data = await response.json();
+        const { roleId } = data;
+
+        // Set the role based on roleId
+        if (roleId === 1) {
+          setRole('Pet Owner');
+        } else if (roleId === 2) {
+          setRole('Pet Adopter');
+        }
+
         Alert.alert('Success', 'Login successful');
         setShowTabBar(true);
         navigation.navigate('home' as never);
