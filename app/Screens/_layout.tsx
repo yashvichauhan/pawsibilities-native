@@ -20,7 +20,7 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  const { showTabBar } = useTabBarVisibility(); // Use context to get the tab visibility state
+  const { showTabBar, role } = useTabBarVisibility(); // Use context to get the tab visibility state
 
   return (
     <Tabs
@@ -36,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: role === 'Pet Owner' ? 'Owner Home' : 'Adopter Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
@@ -65,7 +65,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Account"
         options={{
-          title: 'Profile',
+          title: role === 'Pet Owner' ? 'Owner Profile' : 'Adopter Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
