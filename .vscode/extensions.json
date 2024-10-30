@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "msjsdiag.vscode-react-native",
+    "expo.vscode-expo-tools",
+    "dbaeumer.vscode-eslint",
+    "formulahendry.auto-rename-tag",
+    "styled-components.vscode-styled-components"
+  ]
+}
