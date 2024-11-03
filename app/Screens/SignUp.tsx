@@ -30,7 +30,8 @@ export default function SignUp({ path }: { path: string }) {
     const roleDescription = userType === 'Pet Owner' ? 'Pet Owner' : 'Pet Adopter';
 
     try {
-      const response = await fetch('https://pawsibilities-api.onrender.com/api/signup', {
+      // const response = await fetch('https://pawsibilities-api.onrender.com/api/signup', {
+        const response = await fetch('https://pawsibilities-api.onrender.com/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,13 +116,14 @@ export default function SignUp({ path }: { path: string }) {
                   secureTextEntry
                 />
 
-                <View style={styles.buttonContainer}>
-                  <Button title="Submit" onPress={handleSubmit} />
-                </View>
+                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
 
-                <View style={styles.buttonContainer}>
-                  <Button title="Click here to sign in" onPress={handleLogin} />
-                </View>
+                <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
+                  <Text style={styles.buttonText}>Click here to sign in</Text>
+                </TouchableOpacity>
+
               </View>
     </View>
   );
@@ -135,13 +137,15 @@ const styles = StyleSheet.create({
     height: '100%'
   },
   title: {
+    color: '#6200ee',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   separator: {
     marginVertical: 30,
     height: 1,
-    width: '80%',
+    width: '100%',
+    backgroundColor: '#6200ee'
   },
   heading: {
     fontSize: 38,
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '6200ee',
     borderWidth: 1,
     borderRadius: 5,
     width: '100%',
@@ -185,10 +189,11 @@ const styles = StyleSheet.create({
     width: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#6200ee',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
+    marginBottom:5
   },
   selectedRb: {
     width: 12,
@@ -199,8 +204,17 @@ const styles = StyleSheet.create({
   radioText: {
     fontSize: 16,
   },
-  buttonContainer: {
+  submitButton: {
+    backgroundColor: '#6200ee',
+    borderRadius: 8,
     width: '100%',
-    marginVertical: 10,  // Add vertical space between buttons
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

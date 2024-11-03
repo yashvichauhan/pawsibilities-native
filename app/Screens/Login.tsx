@@ -1,29 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Button, Alert, BackHandler } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  BackHandler,
+  TouchableOpacity,
+} from 'react-native';
 import { Text, View } from '../../components/Themed';
-
-import { useNavigation } from '@react-navigation/native';  // Import useNavigation
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigation = useNavigation();  // Initialize navigation
+  const navigation = useNavigation(); // Initialize navigation
 
-  const { setShowTabBar, setRole } = useTabBarVisibility();
+  const { setShowTabBar, setRole, setUsername, setUserId } =
+    useTabBarVisibility();
 
   useEffect(() => {
-
     setShowTabBar(false);
     setRole(null);
+    setUsername(null);
+    setUserId(null);
 
     // Disable hardware back button on Android
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    );
 
     // Disable swipe back gesture on iOS
     navigation.setOptions({
-      gestureEnabled: false,  // Disable back navigation via swipe gesture on iOS
+      gestureEnabled: false, // Disable back navigation via swipe gesture on iOS
     });
 
     // Cleanup the event listener on component unmount
@@ -32,20 +44,26 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('https://pawsibilities-api.onrender.com/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://pawsibilities-api.onrender.com/api/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      );
 
       if (response.status === 200) {
         const data = await response.json();
-        const { roleId } = data;
+        console.log('Fetched data:', data); // Log entire data to see the response structure
+
+        // Destructure all needed properties at once
+        const { roleId, userID, username } = data;
 
         // Set the role based on roleId
         if (roleId === 1) {
@@ -53,6 +71,33 @@ export default function Login() {
         } else if (roleId === 2) {
           setRole('Pet Adopter');
         }
+
+        // Save userID if it exists
+        /*if (userID) {
+          try {
+            await AsyncStorage.setItem('userID', userID);
+            console.log('User ID saved successfully');
+          } catch (error) {
+            console.error('Error saving User ID to AsyncStorage:', error);
+          }
+        } else {
+          console.error('Error: userID is undefined or null');
+        }
+
+        // Save username if it exists
+        if (username) {
+          try {
+            await AsyncStorage.setItem('username', username);
+            console.log('Username saved successfully');
+          } catch (error) {
+            console.error('Error saving username to AsyncStorage:', error);
+          }
+        } else {
+          console.error('Error: username is undefined or null');
+        }*/
+
+        setUsername(username);
+        setUserId(userID);
 
         Alert.alert('Success', 'Login successful');
         setShowTabBar(true);
@@ -71,52 +116,59 @@ export default function Login() {
   };
 
   const handleSignUp = () => {
-    navigation.navigate('SignUp' as never);  // Navigate to the sign up screen
+    navigation.navigate('SignUp' as never); // Navigate to the sign up screen
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Log In</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText} lightColor="rgba(0,0,0,0.8)" darkColor="rgba(255,255,255,0.8)">
-              Please sign in below
-            </Text>
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
+      <View style={styles.loginContainer}>
+        <Text
+          style={styles.loginText}
+          lightColor="rgba(0,0,0,0.8)"
+          darkColor="rgba(255,255,255,0.8)"
+        >
+          Please sign in below
+        </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-          <View style={styles.buttonContainer}>
-            <Button title="Login" onPress={handleLogin} />
-          </View>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-          <View style={styles.buttonContainer}>
-            <Button title="Create new account" onPress={handleSignUp} />
-          </View>
-            
-          </View>
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Create new account</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
-    height: '100%'
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    height: '100%',
   },
   title: {
     fontSize: 20,
@@ -132,7 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginHorizontal: 6,
     marginTop: 8,
-    marginBottom: 11
+    marginBottom: 11,
   },
   loginContainer: {
     alignItems: 'center',
@@ -147,15 +199,24 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#6200ee',
     borderWidth: 1,
     borderRadius: 5,
     width: '100%',
     marginBottom: 15,
     paddingHorizontal: 10,
   },
-  buttonContainer: {
+  button: {
+    backgroundColor: '#6200ee',
+    borderRadius: 8,
+    paddingVertical: 12,
     width: '100%',
-    marginVertical: 10,  // Add vertical space between buttons
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
