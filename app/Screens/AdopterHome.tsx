@@ -1,71 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useNavigation } from '@react-navigation/native';
+import { useTabBarVisibility } from '@/context/TabBarContext';
 
-import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
-
-export default function TabOneScreen() {
+export default function AdopterHome() {
   const navigation = useNavigation();
-
-  //const [username, setUsername] = useState<string | null>(null);
-
-  const { username } = useTabBarVisibility(); // Use context to get the tab visibility state
-
-  /*useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const storedUsername = await AsyncStorage.getItem('username');
-        setUsername(storedUsername);
-      } catch (error) {
-        console.error('Failed to fetch username from AsyncStorage', error);
-      }
-    };
-    fetchUsername();
-  }, []);*/
+  const { username } = useTabBarVisibility();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Dashboard</Text>
-      {username && <Text style={styles.title}>Howdy, {username}!</Text>}
+      <Text style={styles.heading}>Welcome</Text>
+      {username && <Text style={styles.title}>Hello, {username}!</Text>}
       <View style={styles.separator} />
 
-      <EditScreenInfo path="app/Screens/index.tsx" />
-
-      {/* Section 1: View Previously Posted Pets */}
-      <View style={[styles.section, styles.sectionViewPets]}>
+      {/* Section 1: View Available Pets */}
+      <View style={[styles.section, styles.sectionAvailablePets]}>
         <FontAwesome name="paw" size={24} color="#fff" />
-        <Text style={styles.sectionTitle}>View Previously Posted Pets</Text>
+        <Text style={styles.sectionTitle}>Explore Available Pets</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('ViewPets' as never)}
+          onPress={() => navigation.navigate('AvailablePets' as never)}
         >
           <Text style={styles.buttonText}>View Pets</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Section 2: Post New Pet for Adoption */}
-      <View style={[styles.section, styles.sectionPostPet]}>
-        <FontAwesome name="plus-circle" size={24} color="#fff" />
-        <Text style={styles.sectionTitle}>Post a New Pet for Adoption</Text>
+      {/* Section 2: My Favorite Pets */}
+      <View style={[styles.section, styles.sectionFavorites]}>
+        <FontAwesome name="heart" size={24} color="#fff" />
+        <Text style={styles.sectionTitle}>My Favorites</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('PostNewPet' as never)}
+          onPress={() => navigation.navigate('Favorites' as never)}
         >
-          <Text style={styles.buttonText}>Post a Pet</Text>
+          <Text style={styles.buttonText}>Go to Favorites</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Section 3: About Us */}
+      {/* Section 3: About Us  */}
       <View style={[styles.section, styles.sectionAboutUs]}>
         <FontAwesome name="info-circle" size={24} color="#fff" />
         <Text style={styles.sectionTitle}>About Us</Text>
@@ -77,6 +50,7 @@ export default function TabOneScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Section 4: My Profile */}
       <View style={[styles.section, styles.sectionProfile]}>
         <FontAwesome name="user" size={24} color="#fff" />
         <Text style={styles.sectionTitle}>My Profile</Text>
@@ -96,31 +70,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     height: '100%',
+    backgroundColor: '#f9f9f9',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
   },
   separator: {
-    marginVertical: 30,
+    marginVertical: 20,
     height: 1,
     width: '80%',
     backgroundColor: '#eee',
+    alignSelf: 'center',
   },
   heading: {
-    fontSize: 38,
+    fontSize: 34,
     fontWeight: '700',
-    marginHorizontal: 6,
-    marginTop: 8,
-    marginBottom: 11,
+    color: '#333',
+    marginBottom: 10,
   },
   section: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 15,
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#f5f5f5', // Default color
   },
   sectionTitle: {
     fontSize: 18,
@@ -129,14 +103,14 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#fff',
   },
-  sectionViewPets: {
-    backgroundColor: '#4CAF50', // Green for "View Pets"
+  sectionAvailablePets: {
+    backgroundColor: '#4CAF50', // Green for "View Available Pets"
   },
-  sectionPostPet: {
-    backgroundColor: '#FFA500', // Orange for "Post New Pet"
+  sectionFavorites: {
+    backgroundColor: '#FF6F61', // Red for "My Favorites"
   },
   sectionAboutUs: {
-    backgroundColor: '#2196F3', // Blue for "About Us"
+    backgroundColor: '#5D9CEC', // Blue for "Learn About Adoption"
   },
   sectionProfile: {
     backgroundColor: '#9678cd', // Light Purple for "My Profile"

@@ -101,7 +101,11 @@ export default function Login() {
 
         Alert.alert('Success', 'Login successful');
         setShowTabBar(true);
-        navigation.navigate('home' as never);
+        if (roleId === 1) {
+          navigation.navigate('home' as never); // Pet Owner navigates to Home
+        } else if (roleId === 2) {
+          navigation.navigate('AdopterHome' as never); // Pet Adopter navigates to AvailablePets
+        }
       } else {
         Alert.alert('Error', 'Login attempt failed');
       }
