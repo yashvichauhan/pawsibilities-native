@@ -7,31 +7,36 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
-  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTabBarVisibility } from '@/context/TabBarContext';
 
 export default function ViewPets() {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { userId } = useTabBarVisibility();
+
   // Fetch user pets from API
   const fetchUserPets = async () => {
     try {
-      const userID = await AsyncStorage.getItem('userID');
-      if (!userID) {
-        console.log('No userID found in storage');
-        return;
-      }
+      // const userID = await AsyncStorage.getItem('userID');
+      // if (!userID) {
+      //   console.log('No userID found in storage');
+      //   return;
+      // }
 
       const response = await fetch(
-        `https://pawsibilities-api.onrender.com/api/user/${userID}/pets`,
+        'https://pawsibilities-api.onrender.com/api/user/' + userId + '/pets',
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         },
+      );
+      console.log(
+        'https://pawsibilities-api.onrender.com/api/user/' + userId + '/pets',
       );
 
       const petsData = await response.json();
@@ -171,21 +176,12 @@ export default function ViewPets() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>My Posted Pets</Text>
-
-      {pets.length === 0 ? (
-        <View style={styles.noPetsContainer}>
-          <Text style={styles.noPetsText}>
-            You haven't posted any pets yet!
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={pets}
-          renderItem={renderPetItem}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
+      <FlatList
+        data={pets}
+        renderItem={renderPetItem}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={styles.listContainer}
+      />
     </View>
   );
 }
@@ -267,17 +263,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontWeight: '600',
-  },
-  noPetsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  noPetsText: {
-    fontSize: 18,
-    color: '#555',
-    textAlign: 'center',
-    padding: 20,
   },
 });

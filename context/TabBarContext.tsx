@@ -8,19 +8,37 @@ interface TabBarContextType {
   setRole: React.Dispatch<React.SetStateAction<string | null>>;
   username: string | null;
   setUsername: React.Dispatch<React.SetStateAction<string | null>>;
+  userId: string | null;
+  setUserId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 // Create context with a default value of `undefined`
-const TabBarVisibilityContext = createContext<TabBarContextType | undefined>(undefined);
+const TabBarVisibilityContext = createContext<TabBarContextType | undefined>(
+  undefined,
+);
 
 // Create a provider component that will wrap the app
-export const TabBarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const TabBarProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [showTabBar, setShowTabBar] = useState(false);
   const [role, setRole] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   return (
-    <TabBarVisibilityContext.Provider value={{ showTabBar, setShowTabBar, role, setRole, username, setUsername }}>
+    <TabBarVisibilityContext.Provider
+      value={{
+        showTabBar,
+        setShowTabBar,
+        role,
+        setRole,
+        username,
+        setUsername,
+        userId,
+        setUserId,
+      }}
+    >
       {children}
     </TabBarVisibilityContext.Provider>
   );

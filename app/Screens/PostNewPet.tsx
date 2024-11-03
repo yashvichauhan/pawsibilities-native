@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Button, View, Text, Alert, Image, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Button,
+  View,
+  Text,
+  Alert,
+  Image,
+  ScrollView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTabBarVisibility } from '@/context/TabBarContext';
 
 export default function PostNewPet() {
   const navigation = useNavigation();
+  const { userId } = useTabBarVisibility();
 
   // State variables for each form field
   const [name, setName] = useState('');
@@ -41,7 +53,7 @@ export default function PostNewPet() {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
       });
-  
+
       if (!result.canceled) {
         setImageUri(result.assets[0].uri);
         console.log('Image selected successfully:', result.assets[0].uri);
@@ -54,22 +66,28 @@ export default function PostNewPet() {
   };
 
   const handleSubmit = async () => {
-
-    if (!name || !species || !breed || !age || !color || !description || !imageUri) {
+    if (
+      !name ||
+      !species ||
+      !breed ||
+      !age ||
+      !color ||
+      !description ||
+      !imageUri
+    ) {
       Alert.alert('Error', 'Please fill out all fields and select an image.');
       return;
     }
 
-
     try {
-      const owner = await AsyncStorage.getItem('userID');
-      console.log('Owner ID:',owner);
+      const owner = userId;
+      console.log('Owner ID:', owner);
 
       if (!owner) {
         Alert.alert('Error', 'User ID not found. Please log in.');
         return;
       }
-  
+
       const petData = {
         name,
         species,
@@ -82,10 +100,10 @@ export default function PostNewPet() {
         available,
         owner,
       };
-  
+
       const formData = new FormData();
       formData.append('data', JSON.stringify(petData));
-  
+
       if (imageUri) {
         const imageFile = {
           uri: imageUri,
@@ -94,15 +112,18 @@ export default function PostNewPet() {
         } as any;
         formData.append('image', imageFile);
       }
-  
-      const response = await fetch('https://pawsibilities-api.onrender.com/api/pets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
+
+      const response = await fetch(
+        'https://pawsibilities-api.onrender.com/api/pets',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
         },
-        body: formData,
-      });
-  
+      );
+
       if (response.ok) {
         Alert.alert('Success', 'Pet posted successfully');
         navigation.goBack();
@@ -116,7 +137,7 @@ export default function PostNewPet() {
       console.error('Error posting pet:', (error as Error).message || error);
       Alert.alert('Error', 'An error occurred while posting the pet');
     }
-  };  
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -124,20 +145,55 @@ export default function PostNewPet() {
 
       {/* Image Picker Section */}
       <View style={styles.imageSection}>
-        <TouchableOpacity style={styles.imageButton} onPress={handleSelectImage}>
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={handleSelectImage}
+        >
           <Text style={styles.buttonText}>Select Image</Text>
         </TouchableOpacity>
-        {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+        {imageUri && (
+          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+        )}
       </View>
 
-      <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder="Species" value={species} onChangeText={setSpecies} />
-      <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
-      <TextInput style={styles.input} placeholder="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Color" value={color} onChangeText={setColor} />
-      <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Species"
+        value={species}
+        onChangeText={setSpecies}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Breed"
+        value={breed}
+        onChangeText={setBreed}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Age"
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Color"
+        value={color}
+        onChangeText={setColor}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Description"
+        value={description}
+        onChangeText={setDescription}
+      />
 
-      
       {/* Gender and Size Fields */}
       <Text style={styles.label}>Gender</Text>
       <View style={styles.buttonGroup}>
@@ -272,11 +328,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
-imageButton: {
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  backgroundColor: '#6200ee',
-  borderRadius: 8,
-  alignItems: 'center',
-}
+  imageButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#6200ee',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
 });
