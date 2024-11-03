@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Button, Alert, BackHandler } from 'react-native';
+import { StyleSheet, TextInput, Button, Alert, BackHandler, TouchableOpacity } from 'react-native';
 import { Text, View } from '../../components/Themed';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';  // Import useNavigation
 import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
 
@@ -45,7 +45,10 @@ export default function Login() {
 
       if (response.status === 200) {
         const data = await response.json();
-        const { roleId } = data;
+        console.log('Fetched data:', data);  // Log entire data to see the response structure
+
+        // Destructure all needed properties at once
+        const { roleId, userID, username } = data;
 
         // Set the role based on roleId
         if (roleId === 1) {
@@ -54,9 +57,34 @@ export default function Login() {
           setRole('Pet Adopter');
         }
 
+        // Save userID if it exists
+        if (userID) {
+          try {
+            await AsyncStorage.setItem('userID', userID);
+            console.log('User ID saved successfully');
+          } catch (error) {
+            console.error('Error saving User ID to AsyncStorage:', error);
+          }
+        } else {
+          console.error('Error: userID is undefined or null');
+        }
+
+        // Save username if it exists
+        if (username) {
+          try {
+            await AsyncStorage.setItem('username', username);
+            console.log('Username saved successfully');
+          } catch (error) {
+            console.error('Error saving username to AsyncStorage:', error);
+          }
+        } else {
+          console.error('Error: username is undefined or null');
+        }
+
         Alert.alert('Success', 'Login successful');
         setShowTabBar(true);
         navigation.navigate('home' as never);
+
       } else {
         Alert.alert('Error', 'Login attempt failed');
       }
@@ -99,13 +127,13 @@ export default function Login() {
               secureTextEntry
             />
 
-          <View style={styles.buttonContainer}>
-            <Button title="Login" onPress={handleLogin} />
-          </View>
+<TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-          <View style={styles.buttonContainer}>
-            <Button title="Create new account" onPress={handleSignUp} />
-          </View>
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Create new account</Text>
+        </TouchableOpacity>
             
           </View>
     </View>
@@ -147,15 +175,23 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#6200ee',
     borderWidth: 1,
     borderRadius: 5,
     width: '100%',
     marginBottom: 15,
     paddingHorizontal: 10,
-  },
-  buttonContainer: {
+  },button: {
+    backgroundColor: '#6200ee',
+    borderRadius: 8,
+    paddingVertical: 12,
     width: '100%',
-    marginVertical: 10,  // Add vertical space between buttons
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
