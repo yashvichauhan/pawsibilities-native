@@ -39,3 +39,6 @@ yarn-error.*
 
 expo-env.d.ts
 # @end expo-cli
+
+# Ignore Windows-specific system files
+%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
