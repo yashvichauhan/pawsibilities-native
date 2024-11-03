@@ -5,11 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
+
 export default function TabOneScreen() {
   const navigation = useNavigation();
-  const [username, setUsername] = useState<string | null>(null);
+  //const [username, setUsername] = useState<string | null>(null);
 
-  useEffect(() => {
+  const { username } = useTabBarVisibility(); // Use context to get the tab visibility state
+
+  /*useEffect(() => {
     const fetchUsername = async () => {
       try {
         const storedUsername = await AsyncStorage.getItem('username');
@@ -19,7 +23,7 @@ export default function TabOneScreen() {
       }
     };
     fetchUsername();
-  }, []);
+  }, []);*/
 
   return (
     <View style={styles.container}>

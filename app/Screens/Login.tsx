@@ -11,12 +11,13 @@ export default function Login() {
 
   const navigation = useNavigation();  // Initialize navigation
 
-  const { setShowTabBar, setRole } = useTabBarVisibility();
+  const { setShowTabBar, setRole, setUsername } = useTabBarVisibility();
 
   useEffect(() => {
 
     setShowTabBar(false);
     setRole(null);
+    setUsername(null);
 
     // Disable hardware back button on Android
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
@@ -58,7 +59,7 @@ export default function Login() {
         }
 
         // Save userID if it exists
-        if (userID) {
+        /*if (userID) {
           try {
             await AsyncStorage.setItem('userID', userID);
             console.log('User ID saved successfully');
@@ -79,7 +80,9 @@ export default function Login() {
           }
         } else {
           console.error('Error: username is undefined or null');
-        }
+        }*/
+        
+        setUsername(username);
 
         Alert.alert('Success', 'Login successful');
         setShowTabBar(true);

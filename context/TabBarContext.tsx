@@ -6,6 +6,8 @@ interface TabBarContextType {
   setShowTabBar: React.Dispatch<React.SetStateAction<boolean>>;
   role: string | null;
   setRole: React.Dispatch<React.SetStateAction<string | null>>;
+  username: string | null;
+  setUsername: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 // Create context with a default value of `undefined`
@@ -15,9 +17,10 @@ const TabBarVisibilityContext = createContext<TabBarContextType | undefined>(und
 export const TabBarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [showTabBar, setShowTabBar] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   return (
-    <TabBarVisibilityContext.Provider value={{ showTabBar, setShowTabBar, role, setRole }}>
+    <TabBarVisibilityContext.Provider value={{ showTabBar, setShowTabBar, role, setRole, username, setUsername }}>
       {children}
     </TabBarVisibilityContext.Provider>
   );
