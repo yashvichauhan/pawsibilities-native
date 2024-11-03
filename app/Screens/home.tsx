@@ -37,7 +37,10 @@ export default function TabOneScreen() {
       <View style={[styles.section, styles.sectionViewPets]}>
         <FontAwesome name="paw" size={24} color="#fff" />
         <Text style={styles.sectionTitle}>View Previously Posted Pets</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ViewPets' as never)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('ViewPets' as never)}
+        >
           <Text style={styles.buttonText}>View Pets</Text>
         </TouchableOpacity>
       </View>
@@ -46,7 +49,10 @@ export default function TabOneScreen() {
       <View style={[styles.section, styles.sectionPostPet]}>
         <FontAwesome name="plus-circle" size={24} color="#fff" />
         <Text style={styles.sectionTitle}>Post a New Pet for Adoption</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PostNewPet' as never)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('PostNewPet' as never)}
+        >
           <Text style={styles.buttonText}>Post a Pet</Text>
         </TouchableOpacity>
       </View>
@@ -55,19 +61,21 @@ export default function TabOneScreen() {
       <View style={[styles.section, styles.sectionAboutUs]}>
         <FontAwesome name="info-circle" size={24} color="#fff" />
         <Text style={styles.sectionTitle}>About Us</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AboutUs' as never)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('AboutUs' as never)}
+        >
           <Text style={styles.buttonText}>Learn More</Text>
         </TouchableOpacity>
       </View>
-      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     height: '100%',
   },
   title: {

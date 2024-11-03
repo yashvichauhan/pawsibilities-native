@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, FlatList, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -16,10 +26,13 @@ export default function ViewPets() {
         return;
       }
 
-      const response = await fetch(`https://pawsibilities-api.onrender.com/api/user/${userID}/pets`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/user/${userID}/pets`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
 
       const petsData = await response.json();
       setPets(petsData);
@@ -31,16 +44,18 @@ export default function ViewPets() {
     }
   };
 
-
   const handleDelete = async (petId: string) => {
     try {
-      const response = await fetch(`https://pawsibilities-api.onrender.com/api/pet/${petId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/pet/${petId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
-  
+      );
+
       if (response.ok) {
         Alert.alert('Success', 'Pet deleted successfully');
         fetchUserPets(); // Refresh the list after deletion
@@ -52,16 +67,22 @@ export default function ViewPets() {
       Alert.alert('Error', 'An error occurred while deleting the pet');
     }
   };
-  
-  const handleToggleAvailability = async (petId: string, currentAvailability: boolean) => {
+
+  const handleToggleAvailability = async (
+    petId: string,
+    currentAvailability: boolean,
+  ) => {
     try {
-      const response = await fetch(`https://pawsibilities-api.onrender.com/api/pet/${petId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/pet/${petId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ available: !currentAvailability }),
         },
-        body: JSON.stringify({ available: !currentAvailability }),
-      });
+      );
 
       if (response.ok) {
         Alert.alert('Success', 'Pet status updated successfully');
@@ -80,7 +101,7 @@ export default function ViewPets() {
     React.useCallback(() => {
       setLoading(true); // Show loading indicator
       fetchUserPets();
-    }, [])
+    }, []),
   );
 
   // Render individual pet details in a card
@@ -98,43 +119,28 @@ export default function ViewPets() {
     available: boolean;
   }
 
-  // const renderPetItem = ({ item }: { item: Pet }) => (
-  //   <View style={styles.petCard}>
-  //     <Image source={{ uri: item.imageUrl }} style={styles.petImage} />
-  //     <View style={styles.petDetails}>
-  //       <Text style={styles.petName}>{item.name}</Text>
-  //       <Text style={styles.petInfo}>Species: {item.species}</Text>
-  //       <Text style={styles.petInfo}>Breed: {item.breed}</Text>
-  //       <Text style={styles.petInfo}>Age: {item.age}</Text>
-  //       <Text style={styles.petInfo}>Gender: {item.gender}</Text>
-  //       <Text style={styles.petInfo}>Size: {item.size}</Text>
-  //       <Text style={styles.petInfo}>Color: {item.color}</Text>
-  //       <Text style={styles.petInfo}>Description: {item.description}</Text>
-  //       <Text style={styles.petInfo}>Available for Adoption: {item.available ? 'Yes' : 'No'}</Text>
-
-  //       <View style={styles.actionButtons}>
-  //       <TouchableOpacity
-  //         style={[styles.button, styles.deleteButton]}
-  //         onPress={() => handleDelete(item._id)}
-  //       >
-  //         <Text style={styles.buttonText}>Delete</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //     </View>
-  //   </View>
-  // );
-
   const renderPetItem = ({ item }: { item: any }) => (
     <View style={styles.petCard}>
       <Image source={{ uri: item.imageUrl }} style={styles.petImage} />
       <View style={styles.petDetails}>
         <Text style={styles.petName}>{item.name}</Text>
+        <Text style={styles.petInfo}>Breed: {item.breed}</Text>
+        <Text style={styles.petInfo}>Age: {item.age}</Text>
+        <Text style={styles.petInfo}>Gender: {item.gender}</Text>
+        <Text style={styles.petInfo}>Size: {item.size}</Text>
+        <Text style={styles.petInfo}>Color: {item.color}</Text>
+        <Text style={styles.petInfo}>Description: {item.description}</Text>
         <Text style={styles.petInfo}>Species: {item.species}</Text>
-        <Text style={styles.petInfo}>Available for Adoption: {item.available ? 'Yes' : 'No'}</Text>
+        <Text style={styles.petInfo}>
+          Available for Adoption: {item.available ? 'Yes' : 'No'}
+        </Text>
 
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={[styles.button, item.available ? styles.adoptedButton : styles.unadoptedButton]}
+            style={[
+              styles.button,
+              item.available ? styles.adoptedButton : styles.unadoptedButton,
+            ]}
             onPress={() => handleToggleAvailability(item._id, item.available)}
           >
             <Text style={styles.buttonText}>
@@ -165,12 +171,21 @@ export default function ViewPets() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>My Posted Pets</Text>
-      <FlatList
-        data={pets}
-        renderItem={renderPetItem}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.listContainer}
-      />
+
+      {pets.length === 0 ? (
+        <View style={styles.noPetsContainer}>
+          <Text style={styles.noPetsText}>
+            You haven't posted any pets yet!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={pets}
+          renderItem={renderPetItem}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 }
@@ -252,5 +267,17 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontWeight: '600',
+  },
+  noPetsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  noPetsText: {
+    fontSize: 18,
+    color: '#555',
+    textAlign: 'center',
+    padding: 20,
   },
 });
