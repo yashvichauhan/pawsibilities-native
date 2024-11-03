@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +10,7 @@ import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the con
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
+
   //const [username, setUsername] = useState<string | null>(null);
 
   const { username } = useTabBarVisibility(); // Use context to get the tab visibility state
@@ -68,6 +70,11 @@ export default function TabOneScreen() {
           <Text style={styles.buttonText}>Learn More</Text>
         </TouchableOpacity>
       </View>
+      
+       <Button
+        title="My Profile"
+        onPress={() => navigation.navigate('MyProfile' as never)}
+      />
     </View>
   );
 }
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
     marginTop: 8,
     marginBottom: 11,
+
   },
   section: {
     flexDirection: 'row',
@@ -130,5 +138,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+
   },
 });
