@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, Button, View, Text, Alert, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,6 +19,22 @@ export default function PostNewPet() {
   const [available, setAvailable] = useState(true);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
+  useEffect(() => {
+    return () => resetForm(); // Reset form when the component unmounts
+  }, []);
+
+  const resetForm = () => {
+    setName('');
+    setSpecies('');
+    setBreed('');
+    setAge('');
+    setGender('Unknown');
+    setSize('Medium');
+    setColor('');
+    setDescription('');
+    setImageUri(null);
+  };
+
   const handleSelectImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -38,6 +54,13 @@ export default function PostNewPet() {
   };
 
   const handleSubmit = async () => {
+
+    if (!name || !species || !breed || !age || !color || !description || !imageUri) {
+      Alert.alert('Error', 'Please fill out all fields and select an image.');
+      return;
+    }
+
+
     try {
       const owner = await AsyncStorage.getItem('userID');
       console.log('Owner ID:',owner);
@@ -83,6 +106,7 @@ export default function PostNewPet() {
       if (response.ok) {
         Alert.alert('Success', 'Pet posted successfully');
         navigation.goBack();
+        resetForm();
       } else {
         const errorData = await response.json();
         console.error('Failed to post pet:', errorData);
@@ -98,6 +122,14 @@ export default function PostNewPet() {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <Text style={styles.heading}>Post a New Pet</Text>
 
+      {/* Image Picker Section */}
+      <View style={styles.imageSection}>
+        <TouchableOpacity style={styles.imageButton} onPress={handleSelectImage}>
+          <Text style={styles.buttonText}>Select Image</Text>
+        </TouchableOpacity>
+        {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+      </View>
+
       <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
       <TextInput style={styles.input} placeholder="Species" value={species} onChangeText={setSpecies} />
       <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
@@ -105,12 +137,7 @@ export default function PostNewPet() {
       <TextInput style={styles.input} placeholder="Color" value={color} onChangeText={setColor} />
       <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
 
-      {/* Image Picker Section */}
-      <View style={styles.imageSection}>
-        <Button title="Select Image" onPress={handleSelectImage} />
-        {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
-      </View>
-
+      
       {/* Gender and Size Fields */}
       <Text style={styles.label}>Gender</Text>
       <View style={styles.buttonGroup}>
@@ -244,4 +271,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 10,
   },
+
+imageButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  backgroundColor: '#6200ee',
+  borderRadius: 8,
+  alignItems: 'center',
+}
 });
