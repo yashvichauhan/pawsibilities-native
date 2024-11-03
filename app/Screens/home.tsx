@@ -1,13 +1,23 @@
-import { StyleSheet } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 export default function TabOneScreen() {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Dashboard</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <Button
+        title="My Profile"
+        onPress={() => navigation.navigate('MyProfile' as never)}
+      />
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
       <EditScreenInfo path="app/Screens/index.tsx" />
     </View>
   );
@@ -15,9 +25,9 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
-    height: '100%'
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    height: '100%',
   },
   title: {
     fontSize: 20,
@@ -33,6 +43,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginHorizontal: 6,
     marginTop: 8,
-    marginBottom: 11
+    marginBottom: 11,
   },
 });
