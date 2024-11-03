@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "name": "Whiskers",
+    "status": "Available",
+    "image": "../assets/images/whiskers.png",
+    "age": "2 years",
+    "breed": "Siamese Cat",
+    "description": "Whiskers is a friendly and curious cat, perfect for a family."
+  },
+  {
+    "id": 2,
+    "name": "Barky",
+    "status": "Adopted",
+    "image": "../assets/images/barky.png",
+    "age": "3 years",
+    "breed": "Golden Retriever",
+    "description": "Barky is an energetic dog who loves outdoor activities."
+  },
+  {
+    "id": 3,
+    "name": "Fluffy",
+    "status": "Available",
+    "image": "../assets/images/fluffy.png",
+    "age": "1 year",
+    "breed": "Persian Cat",
+    "description": "Fluffy is calm and affectionate, ideal for a quiet home."
+  },
+  {
+    "id": 4,
+    "name": "Shadow",
+    "status": "Available",
+    "image": "../assets/images/shadow.png",
+    "age": "4 years",
+    "breed": "Black Lab",
+    "description": "Shadow is loyal and protective, a great guard dog."
+  },
+  {
+    "id": 5,
+    "name": "Spot",
+    "status": "Adopted",
+    "image": "../assets/images/spot.png",
+    "age": "2 years",
+    "breed": "Dalmatian",
+    "description": "Spot is playful and loves children, an excellent family pet."
+  },
+  {
+    "id": 6,
+    "name": "Mittens",
+    "status": "Available",
+    "image": "../assets/images/mittens.png",
+    "age": "6 months",
+    "breed": "Tabby Cat",
+    "description": "Mittens is shy but warms up quickly, loves to snuggle."
+  },
+  {
+    "id": 7,
+    "name": "Buddy",
+    "status": "Adopted",
+    "image": "../assets/images/buddy.png",
+    "age": "5 years",
+    "breed": "Beagle",
+    "description": "Buddy is calm and gentle, perfect for a quiet household."
+  },
+  {
+    "id": 8,
+    "name": "Daisy",
+    "status": "Available",
+    "image": "../assets/images/daisy.png",
+    "age": "1.5 years",
+    "breed": "Cocker Spaniel",
+    "description": "Daisy is cheerful and sociable, loves playing fetch."
+  },
+  {
+    "id": 9,
+    "name": "Tiger",
+    "status": "Available",
+    "image": "../assets/images/tiger.png",
+    "age": "3 years",
+    "breed": "Maine Coon",
+    "description": "Tiger is independent but enjoys company, a large and fluffy friend."
+  },
+  {
+    "id": 10,
+    "name": "Max",
+    "status": "Adopted",
+    "image": "../assets/images/max.png",
+    "age": "2.5 years",
+    "breed": "Bulldog",
+    "description": "Max is a relaxed and loyal companion, perfect for a family."
+  },
+  {
+    "id": 11,
+    "name": "Oscar",
+    "status": "Available",
+    "image": "../assets/images/whiskers.png",
+    "age": "4 years",
+    "breed": "British Shorthair",
+    "description": "Oscar is calm and dignified, enjoys a quiet environment."
+  },
+  {
+    "id": 12,
+    "name": "Bella",
+    "status": "Adopted",
+    "image": "../assets/images/barky.png",
+    "age": "1 year",
+    "breed": "Shih Tzu",
+    "description": "Bella is playful and sweet, loves attention and companionship."
+  }
+]
