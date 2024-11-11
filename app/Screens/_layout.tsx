@@ -8,6 +8,8 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
 import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import axios from 'axios';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -21,6 +23,17 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const { showTabBar, role } = useTabBarVisibility(); // Use context to get the tab visibility state
+
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      await axios.get('https://pawsibilities-api.onrender.com/api/signout');
+      navigation.navigate('Login' as never);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <Tabs
@@ -39,18 +52,16 @@ export default function TabLayout() {
             title: role === 'Pet Owner' ? 'Owner Home' : 'Adopter Home',
             tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
             headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
+                <Pressable onPress={handleLogout}>
                   {({ pressed }) => (
                     <FontAwesome
-                      name="info-circle"
+                      name="sign-out"
                       size={25}
                       color={Colors[colorScheme ?? 'light'].text}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
                 </Pressable>
-              </Link>
             ),
           }}
         />
@@ -65,18 +76,17 @@ export default function TabLayout() {
             title: 'Adopter Home',
             tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
             headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
+                <Pressable onPress={handleLogout}>
                   {({ pressed }) => (
                     <FontAwesome
-                      name="info-circle"
+                      name="sign-out"
                       size={25}
                       color={Colors[colorScheme ?? 'light'].text}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
                 </Pressable>
-              </Link>
+          
             ),
           }}
         />
@@ -91,6 +101,19 @@ export default function TabLayout() {
           options={{
             title: 'View Pets',
             tabBarIcon: ({ color }) => <TabBarIcon name="paw" color={color} />,
+            headerRight: () => (
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+        
+          ),
           }}
         />
       ) : (
@@ -106,6 +129,19 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => (
               <TabBarIcon name="plus-circle" color={color} />
             ),
+            headerRight: () => (
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+        
+          ),
           }}
         />
       ) : (
@@ -119,18 +155,16 @@ export default function TabLayout() {
             title: 'Available Pets',
             tabBarIcon: ({ color }) => <TabBarIcon name="paw" color={color} />,
             headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
+                <Pressable onPress={handleLogout}>
                   {({ pressed }) => (
                     <FontAwesome
-                      name="info-circle"
+                      name="sign-out"
                       size={25}
                       color={Colors[colorScheme ?? 'light'].text}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
                 </Pressable>
-              </Link>
             ),
           }}
         />
@@ -147,18 +181,16 @@ export default function TabLayout() {
               <TabBarIcon name="heart" color={color} />
             ),
             headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
+                <Pressable onPress={handleLogout}>
                   {({ pressed }) => (
                     <FontAwesome
-                      name="info-circle"
+                      name="sign-out"
                       size={25}
                       color={Colors[colorScheme ?? 'light'].text}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
                 </Pressable>
-              </Link>
             ),
           }}
         />
@@ -175,6 +207,18 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => (
               <TabBarIcon name="info-circle" color={color} />
             ),
+            headerRight: () => (
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+          ),
           }}
         />
       ) : (
@@ -187,6 +231,18 @@ export default function TabLayout() {
           options={{
             title: role === 'Pet Owner' ? 'Owner Profile' : 'Adopter Profile',
             tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+            headerRight: () => (
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+          ),
           }}
         />
       ) : (

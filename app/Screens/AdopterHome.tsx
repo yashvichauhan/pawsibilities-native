@@ -56,7 +56,7 @@ export default function AdopterHome() {
         <Text style={styles.sectionTitle}>My Profile</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('MyProfile' as never)}
+          onPress={() => navigation.navigate('Account' as never)}
         >
           <Text style={styles.buttonText}>Go to Profile</Text>
         </TouchableOpacity>
