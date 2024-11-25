@@ -11,6 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useTabBarVisibility } from '@/context/TabBarContext';
 
 interface Pet {
   _id: string;
@@ -25,6 +26,7 @@ interface Pet {
   description: string;
   available: boolean;
   owner: string; // Owner ID
+  interestedAdopters: string[]; // Interested Adopters;
 }
 
 interface Owner {
@@ -39,6 +41,7 @@ export default function AvailablePets() {
   const [selectedPetOwner, setSelectedPetOwner] = useState<Owner | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
+  const { userId } = useTabBarVisibility();
 
   // Fetch available pets from API
   const fetchAvailablePets = async () => {
@@ -102,6 +105,35 @@ export default function AvailablePets() {
         ? prevFavorites.filter((id) => id !== petId)
         : [...prevFavorites, petId],
     );
+  };
+
+  // Handle Interest in Pet
+  const handleInterest = async (petId: string, paramUserId: string | null) => {
+    const userId = paramUserId; 
+
+    try {
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/pet/${petId}/interest`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+          
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+        console.error('Error adding interest:', errorData);
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+      console.error('Error adding interest:', error);
+    }
   };
 
   // Filter pets based on search text
@@ -204,6 +236,15 @@ export default function AvailablePets() {
               <Text style={styles.modalText}>
                 Owner: {selectedPetOwner ? selectedPetOwner.name : 'Loading...'}
               </Text>
+
+              {/* "I'm Interested" Button */}
+              <TouchableOpacity
+                onPress={() => handleInterest(selectedPet._id, userId as string | null)}
+                style={styles.interestButton}
+              >
+                <Text style={styles.interestButtonText}>I'm Interested</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
@@ -318,5 +359,17 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  interestButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#28a745',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  interestButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

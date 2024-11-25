@@ -8,14 +8,23 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTabBarVisibility } from '@/context/TabBarContext';
 
+// Define the type for Adopter
+interface Adopter {
+  _id: string;
+  username: string;
+  email: string;
+}
+
 export default function ViewPets() {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [showAdoptersModal, setShowAdoptersModal] = useState(false);
+  const [adopters, setAdopters] = useState<Adopter[]>([]); // Explicitly type the adopters state
   const { userId } = useTabBarVisibility();
 
   // Fetch user pets from API
@@ -70,6 +79,68 @@ export default function ViewPets() {
       console.error('Error deleting pet:', error);
       Alert.alert('Error', 'An error occurred while deleting the pet');
     }
+  };
+
+  // Fetch interested adopters for a pet
+  const handleViewInterestedAdopters = async (petId: string) => {
+    try {
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/pet/${petId}/interested-adopters`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+  
+      if (response.ok) {
+        const adoptersData = await response.json();
+        setAdopters(adoptersData);
+        setShowAdoptersModal(true);  // Show the modal with adopters
+      } else {
+        Alert.alert('Error', 'Failed to fetch interested adopters');
+      }
+    } catch (error) {
+      console.error('Error fetching interested adopters:', error);
+      Alert.alert('Error', 'An error occurred while fetching adopters');
+    }
+  };
+
+  // Render the modal with adopters' details
+  const renderAdoptersModal = () => {
+    return (
+      <Modal
+        visible={showAdoptersModal}
+        animationType="slide"
+        onRequestClose={() => setShowAdoptersModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Interested Adopters</Text>
+  
+          {adopters.length === 0 ? (
+            <Text style={styles.noAdoptersText}>No interested adopters found</Text>
+          ) : (
+            <FlatList
+              data={adopters}
+              renderItem={({ item }) => (
+                <View style={styles.adopterCard}>
+                  <Text style={styles.adopterText}>Username: {item.username}</Text>
+                  <Text style={styles.adopterText}>Email: {item.email}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item._id}
+              contentContainerStyle={styles.listContainer}
+            />
+          )}
+  
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setShowAdoptersModal(false)}
+          >
+            <Text style={styles.buttonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    );
   };
 
   const handleToggleAvailability = async (
@@ -151,12 +222,21 @@ export default function ViewPets() {
               {item.available ? 'Mark as Adopted' : 'Mark as Available'}
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.interestedButton]}
+            onPress={() => handleViewInterestedAdopters(item._id)} // Open interested adopters modal
+          >
+            <Text style={styles.buttonText}>Interested Adopters</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.button, styles.deleteButton]}
             onPress={() => handleDelete(item._id)}
           >
-            <Text style={styles.buttonText}>Delete</Text>
+          <Text style={styles.buttonText}>Delete</Text>
           </TouchableOpacity>
+          
         </View>
       </View>
     </View>
@@ -181,6 +261,7 @@ export default function ViewPets() {
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}
       />
+      {renderAdoptersModal()}
     </View>
   );
 }
@@ -263,4 +344,40 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '600',
   },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  adopterCard: {
+    padding: 15,
+    marginBottom: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  adopterText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  closeButton: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  interestedButton: {
+    backgroundColor: '#6200ee'
+  },
+  noAdoptersText: {
+    fontSize: 18,
+    color: '#777',
+    textAlign: 'center',
+    marginVertical: 20,
+  }
 });
