@@ -1,3 +1,6 @@
+/**
+ * Edit Profile Screen for users to update their profile details
+ */
 import * as React from 'react';
 import { View, StyleSheet } from 'react-native';
 import {
@@ -38,6 +41,10 @@ const EditProfile: React.FC = () => {
     }
   }, [userId, lastUpdated]);
 
+  /**
+   * Update user details in the database
+   * @returns void
+   */
   const handleSave = async () => {
     try {
       console.log('Updating user:', user);

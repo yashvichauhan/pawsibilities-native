@@ -1,3 +1,6 @@
+/**
+ * Adopter Home Screen for Pet Adopters to view available pets, their favorites, and more.
+ */
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';

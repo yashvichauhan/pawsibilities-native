@@ -1,3 +1,6 @@
+/**
+ * My Profile Screen for Pet Owners and Pet Adopters
+ */
 import * as React from 'react';
 import { PaperProvider, Text, Button } from 'react-native-paper';
 import { View, Image, StyleSheet } from 'react-native';
@@ -13,6 +16,7 @@ const MyProfile: React.FC = () => {
   const navigation = useNavigation();
   const { userId } = useTabBarVisibility();
 
+  // Fetch the user details from the API
   useEffect(() => {
     // Load the current user details from the API using userId
     const fetchUser = async () => {

@@ -1,3 +1,6 @@
+/**
+ * Login screen for the app
+ */
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -12,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the context hook
 
+// Login screen component
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +25,7 @@ export default function Login() {
   const { setShowTabBar, setRole, setUsername, setUserId } =
     useTabBarVisibility();
 
+  // useEffect hook to run code on component mount
   useEffect(() => {
     setShowTabBar(false);
     setRole(null);
@@ -45,7 +50,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const response = await fetch(
-        'https://pawsibilities-api.onrender.com/api/login',
+        `https://pawsibilities-api.onrender.com/api/login`,
         {
           method: 'POST',
           headers: {
@@ -72,30 +77,6 @@ export default function Login() {
           setRole('Pet Adopter');
         }
 
-        // Save userID if it exists
-        /*if (userID) {
-          try {
-            await AsyncStorage.setItem('userID', userID);
-            console.log('User ID saved successfully');
-          } catch (error) {
-            console.error('Error saving User ID to AsyncStorage:', error);
-          }
-        } else {
-          console.error('Error: userID is undefined or null');
-        }
-
-        // Save username if it exists
-        if (username) {
-          try {
-            await AsyncStorage.setItem('username', username);
-            console.log('Username saved successfully');
-          } catch (error) {
-            console.error('Error saving username to AsyncStorage:', error);
-          }
-        } else {
-          console.error('Error: username is undefined or null');
-        }*/
-
         setUsername(username);
         setUserId(userID);
 
@@ -119,6 +100,7 @@ export default function Login() {
     setPassword('');
   };
 
+  // Function to navigate to the sign up screen
   const handleSignUp = () => {
     navigation.navigate('SignUp' as never); // Navigate to the sign up screen
   };

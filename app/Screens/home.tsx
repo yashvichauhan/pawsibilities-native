@@ -1,3 +1,6 @@
+/**
+ * Home Screen for the Pet Owner
+ */
 import React, { useEffect, useState } from 'react';
 import {
   Button,
@@ -17,21 +20,7 @@ import { useTabBarVisibility } from '@/context/TabBarContext'; // Import the con
 export default function TabOneScreen() {
   const navigation = useNavigation();
 
-  //const [username, setUsername] = useState<string | null>(null);
-
   const { username } = useTabBarVisibility(); // Use context to get the tab visibility state
-
-  /*useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const storedUsername = await AsyncStorage.getItem('username');
-        setUsername(storedUsername);
-      } catch (error) {
-        console.error('Failed to fetch username from AsyncStorage', error);
-      }
-    };
-    fetchUsername();
-  }, []);*/
 
   return (
     <View style={styles.container}>

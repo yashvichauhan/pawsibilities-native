@@ -52,16 +52,16 @@ export default function TabLayout() {
             title: role === 'Pet Owner' ? 'Owner Home' : 'Adopter Home',
             tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
             headerRight: () => (
-                <Pressable onPress={handleLogout}>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="sign-out"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             ),
           }}
         />
@@ -76,17 +76,16 @@ export default function TabLayout() {
             title: 'Adopter Home',
             tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
             headerRight: () => (
-                <Pressable onPress={handleLogout}>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="sign-out"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-          
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             ),
           }}
         />
@@ -112,8 +111,7 @@ export default function TabLayout() {
                   />
                 )}
               </Pressable>
-        
-          ),
+            ),
           }}
         />
       ) : (
@@ -140,8 +138,7 @@ export default function TabLayout() {
                   />
                 )}
               </Pressable>
-        
-          ),
+            ),
           }}
         />
       ) : (
@@ -155,16 +152,16 @@ export default function TabLayout() {
             title: 'Available Pets',
             tabBarIcon: ({ color }) => <TabBarIcon name="paw" color={color} />,
             headerRight: () => (
-                <Pressable onPress={handleLogout}>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="sign-out"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             ),
           }}
         />
@@ -181,16 +178,16 @@ export default function TabLayout() {
               <TabBarIcon name="heart" color={color} />
             ),
             headerRight: () => (
-                <Pressable onPress={handleLogout}>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="sign-out"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
+              <Pressable onPress={handleLogout}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             ),
           }}
         />
@@ -218,7 +215,7 @@ export default function TabLayout() {
                   />
                 )}
               </Pressable>
-          ),
+            ),
           }}
         />
       ) : (
@@ -242,7 +239,7 @@ export default function TabLayout() {
                   />
                 )}
               </Pressable>
-          ),
+            ),
           }}
         />
       ) : (

@@ -1,3 +1,8 @@
+/**
+ * Post a New Pet Screen for Pet Owners
+ * Allows users to post a new pet for adoption
+ * Uses AI to predict species and breed based on the image
+ */
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -12,7 +17,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTabBarVisibility } from '@/context/TabBarContext';
 
 export default function PostNewPet() {
@@ -30,9 +34,11 @@ export default function PostNewPet() {
   const [description, setDescription] = useState('');
   const [available, setAvailable] = useState(true);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [labels, setLabels] = useState<string[]>([]);
 
+  // Reset the form when the component mounts
   useEffect(() => {
-    return () => resetForm(); // Reset form when the component unmounts
+    return () => resetForm();
   }, []);
 
   const resetForm = () => {
@@ -45,8 +51,15 @@ export default function PostNewPet() {
     setColor('');
     setDescription('');
     setImageUri(null);
+    setLabels([]);
   };
 
+  /**
+   * Handle selecting an image from the device
+   * Uses the ImagePicker API to select an image
+   * and sets the image URI to state
+   * @returns void
+   */
   const handleSelectImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -65,6 +78,202 @@ export default function PostNewPet() {
     }
   };
 
+  /**
+   * Get AI prediction for the selected image
+   */
+  const popularPets = {
+    dog: [
+      'Labrador Retriever',
+      'German Shepherd',
+      'Golden Retriever',
+      'Bulldog',
+      'Poodle',
+      'Husky',
+      'Shih-Tzu',
+      'Beagle',
+      'Boxer',
+      'Chihuahua',
+      'Dachshund',
+      'Rottweiler',
+      'Cocker Spaniel',
+      'Doberman',
+      'Pomeranian',
+      'Schnauzer',
+      'Border Collie',
+      'Yorkshire Terrier',
+      'French Bulldog',
+    ],
+    cat: [
+      'Persian',
+      'Maine Coon',
+      'Siamese',
+      'Ragdoll',
+      'Bengal',
+      'British Shorthair',
+      'Abyssinian',
+      'Sphynx',
+      'Scottish Fold',
+      'Russian Blue',
+    ],
+    rabbit: [
+      'Netherland Dwarf',
+      'Lionhead',
+      'Rex',
+      'Flemish Giant',
+      'Himalayan',
+      'Holland Lop',
+      'Mini Rex',
+      'English Angora',
+      'Mini Lop',
+    ],
+    bird: [
+      'Parrot',
+      'Canary',
+      'Cockatiel',
+      'Budgerigar',
+      'Macaw',
+      'Finch',
+      'Pigeon',
+      'Lovebird',
+      'Cockatoo',
+      'Conure',
+      'African Grey',
+      'Quaker Parrot',
+    ],
+    fish: [
+      'Goldfish',
+      'Betta Fish',
+      'Guppy',
+      'Angelfish',
+      'Cichlid',
+      'Neon Tetra',
+      'Oscar',
+      'Platies',
+      'Tetra',
+      'Barbs',
+      'Koi',
+      'Discus',
+      'Rainbow Fish',
+    ],
+    reptile: [
+      'Turtle',
+      'Iguana',
+      'Gecko',
+      'Chameleon',
+      'Bearded Dragon',
+      'Snake',
+      'Crocodile',
+      'Alligator',
+      'Lizard',
+      'Anole',
+      'Skink',
+    ],
+    hamster: [
+      'Syrian Hamster',
+      'Dwarf Hamster',
+      'Roborovski Hamster',
+      'Campbell’s Hamster',
+    ],
+  };
+
+  /**
+   * Get AI prediction for the selected image
+   * Uses the combined API endpoint to upload the image
+   * and get the prediction labels and auto-fill the form fields
+   * @returns prediction labels
+   */
+  const handleGetAIPrediction = async () => {
+    if (!imageUri) {
+      Alert.alert('Error', 'Please select an image first.');
+      return;
+    }
+
+    try {
+      // Prepare image data for upload
+      const formData = new FormData();
+      formData.append('image', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'pet.jpg',
+      } as any);
+
+      // Upload image and perform analysis using the combined API endpoint
+      const uploadResponse = await fetch(
+        `https://pawsibilities-api.onrender.com/api/upload-and-analyze`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        },
+      );
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        console.error('Upload failed:', errorData);
+        Alert.alert('Error', 'Failed to upload and analyze image.');
+        return;
+      }
+
+      const { imageUrl, labels } = await uploadResponse.json();
+
+      // Match the labels with the species and breed
+      let detectedSpecies: keyof typeof popularPets | null = null;
+      let detectedBreed = '';
+
+      // Loop through labels to find species and breed
+      const speciesMatches = Object.keys(
+        popularPets,
+      ) as (keyof typeof popularPets)[]; // Type it as an array of species keys
+      speciesMatches.forEach((species) => {
+        // Check if species is present in the labels
+        if (
+          labels.some((label: string) => label.toLowerCase().includes(species))
+        ) {
+          detectedSpecies = species;
+
+          // Check for breed match in the labels
+          popularPets[species].forEach((breed) => {
+            if (
+              labels.some((label: string) =>
+                label.toLowerCase().includes(breed.toLowerCase()),
+              )
+            ) {
+              detectedBreed = breed; // Set the breed if a match is found
+            }
+          });
+
+          // If no breed is found, set the first breed as default
+          if (!detectedBreed) {
+            detectedBreed = popularPets[species][0]; // Set the first breed from the list
+          }
+        }
+      });
+
+      // If no species detected, clear the fields
+      if (!detectedSpecies) {
+        setSpecies('');
+        setBreed('');
+      } else {
+        setSpecies(detectedSpecies); // Set the detected species
+        setBreed(detectedBreed); // Set the breed (either matched or first one)
+      }
+      // Set the labels to state or do further processing
+      setLabels(labels);
+      console.log('Labels:', labels);
+
+      Alert.alert('AI Prediction', 'Labels retrieved successfully!');
+    } catch (error) {
+      console.error('Error getting AI prediction:', error);
+      Alert.alert('Error', 'An error occurred while getting AI predictions.');
+    }
+  };
+
+  /**
+   * Submit the form data to the backend
+   * @returns void
+   */
   const handleSubmit = async () => {
     if (
       !name ||
@@ -114,7 +323,7 @@ export default function PostNewPet() {
       }
 
       const response = await fetch(
-        'https://pawsibilities-api.onrender.com/api/pets',
+        `https://pawsibilities-api.onrender.com/api/pets`,
         {
           method: 'POST',
           headers: {
@@ -153,6 +362,20 @@ export default function PostNewPet() {
         </TouchableOpacity>
         {imageUri && (
           <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+        )}
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleGetAIPrediction}
+        >
+          <Text style={styles.buttonText}>Get AI Prediction</Text>
+        </TouchableOpacity>
+        {labels.length > 0 && (
+          <View style={styles.labelsContainer}>
+            <Text>Detected Labels:</Text>
+            {labels.map((label, index) => (
+              <Text key={index}>- {label}</Text>
+            ))}
+          </View>
         )}
       </View>
 
@@ -334,5 +557,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#6200ee',
     borderRadius: 8,
     alignItems: 'center',
+  },
+  labelsContainer: {
+    marginTop: 16,
   },
 });

@@ -1,7 +1,19 @@
+/**
+ * This is the sign up screen where users can sign up for an account
+ * Users can choose between being a Pet Owner or a Pet Adopter
+ * Users can enter their username, email, and password
+ */
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Button, Alert, TouchableOpacity, BackHandler } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  TouchableOpacity,
+  BackHandler,
+} from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { useNavigation } from '@react-navigation/native';  // Import useNavigation
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 export default function SignUp({ path }: { path: string }) {
   const [username, setUsername] = useState('');
@@ -9,15 +21,18 @@ export default function SignUp({ path }: { path: string }) {
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('Pet Owner');
 
-  const navigation = useNavigation();  // Initialize navigation
+  const navigation = useNavigation(); // Initialize navigation
 
+  // Disable hardware back button on Android and swipe back gesture on iOS
   useEffect(() => {
-    // Disable hardware back button on Android
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    );
 
     // Disable swipe back gesture on iOS
     navigation.setOptions({
-      gestureEnabled: false,  // Disable back navigation via swipe gesture on iOS
+      gestureEnabled: false, // Disable back navigation via swipe gesture on iOS
     });
 
     // Cleanup the event listener on component unmount
@@ -27,23 +42,26 @@ export default function SignUp({ path }: { path: string }) {
   const handleSubmit = async () => {
     // Determine roleId and roleDescription based on the userType
     const roleId = userType === 'Pet Owner' ? '1' : '2';
-    const roleDescription = userType === 'Pet Owner' ? 'Pet Owner' : 'Pet Adopter';
+    const roleDescription =
+      userType === 'Pet Owner' ? 'Pet Owner' : 'Pet Adopter';
 
     try {
-      // const response = await fetch('https://pawsibilities-api.onrender.com/api/signup', {
-        const response = await fetch('https://pawsibilities-api.onrender.com/api/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/signup`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            roleId,
+            roleDescription,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          roleId,
-          roleDescription,
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to sign up');
@@ -60,99 +78,111 @@ export default function SignUp({ path }: { path: string }) {
     setUsername('');
     setEmail('');
     setPassword('');
-    setUserType('Pet Owner')
+    setUserType('Pet Owner');
   };
 
   const handleLogin = () => {
-    navigation.navigate('Login' as never);  // Navigate to the login screen
+    navigation.navigate('Login' as never); // Navigate to the login screen
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Sign Up</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-              <View style={styles.getStartedContainer}>
-                <Text style={styles.getStartedText} lightColor="rgba(0,0,0,0.8)" darkColor="rgba(255,255,255,0.8)">
-                  Please enter details below
-                </Text>
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
+      <View style={styles.getStartedContainer}>
+        <Text
+          style={styles.getStartedText}
+          lightColor="rgba(0,0,0,0.8)"
+          darkColor="rgba(255,255,255,0.8)"
+        >
+          Please enter details below
+        </Text>
 
-                {/* Radio buttons for User Type */}
-                <View style={styles.radioContainer}>
-                  <TouchableOpacity style={styles.radioButton} onPress={() => setUserType('Pet Owner')}>
-                    <View style={styles.radioCircle}>
-                      {userType === 'Pet Owner' && <View style={styles.selectedRb} />}
-                    </View>
-                    <Text style={styles.radioText}>Pet Owner</Text>
-                  </TouchableOpacity>
+        {/* Radio buttons for User Type */}
+        <View style={styles.radioContainer}>
+          <TouchableOpacity
+            style={styles.radioButton}
+            onPress={() => setUserType('Pet Owner')}
+          >
+            <View style={styles.radioCircle}>
+              {userType === 'Pet Owner' && <View style={styles.selectedRb} />}
+            </View>
+            <Text style={styles.radioText}>Pet Owner</Text>
+          </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.radioButton} onPress={() => setUserType('Pet Adopter')}>
-                    <View style={styles.radioCircle}>
-                      {userType === 'Pet Adopter' && <View style={styles.selectedRb} />}
-                    </View>
-                    <Text style={styles.radioText}>Pet Adopter</Text>
-                  </TouchableOpacity>
-                </View>
+          <TouchableOpacity
+            style={styles.radioButton}
+            onPress={() => setUserType('Pet Adopter')}
+          >
+            <View style={styles.radioCircle}>
+              {userType === 'Pet Adopter' && <View style={styles.selectedRb} />}
+            </View>
+            <Text style={styles.radioText}>Pet Adopter</Text>
+          </TouchableOpacity>
+        </View>
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your username"
-                  value={username}
-                  onChangeText={setUsername}
-                />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your username"
+          value={username}
+          onChangeText={setUsername}
+        />
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                  <Text style={styles.buttonText}>Submit</Text>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
-                  <Text style={styles.buttonText}>Click here to sign in</Text>
-                </TouchableOpacity>
-
-              </View>
+        <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Click here to sign in</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
-    paddingHorizontal: 20, 
-    paddingVertical: 10, 
-    height: '100%'
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    height: '100%',
   },
   title: {
     color: '#6200ee',
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: '100%',
-    backgroundColor: '#6200ee'
+    backgroundColor: '#6200ee',
   },
   heading: {
     fontSize: 38,
     fontWeight: '700',
     marginHorizontal: 6,
     marginTop: 8,
-    marginBottom: 11
+    marginBottom: 11,
   },
   getStartedContainer: {
     alignItems: 'center',
@@ -193,7 +223,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
-    marginBottom:5
+    marginBottom: 5,
   },
   selectedRb: {
     width: 12,
