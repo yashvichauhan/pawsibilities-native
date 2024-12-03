@@ -1,3 +1,7 @@
+/**
+ * Available Pets Screen for Pet Adopters to view pets available for adoption and express interest in them.
+ */
+
 import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
@@ -9,10 +13,13 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { useTabBarVisibility } from '@/context/TabBarContext';
 
+// Define the Pet and Owner interfaces
 interface Pet {
   _id: string;
   imageUrl: string;
@@ -27,12 +34,14 @@ interface Pet {
   available: boolean;
   owner: string; // Owner ID
   interestedAdopters: string[]; // Interested Adopters;
+  isFavorite: boolean;
 }
 
 interface Owner {
   name: string;
 }
 
+// Define the AvailablePets component
 export default function AvailablePets() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
@@ -42,12 +51,23 @@ export default function AvailablePets() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
   const { userId } = useTabBarVisibility();
+  const [filters, setFilters] = useState({
+    gender: '', // Initially, no gender filter is applied
+    color: '', // Initially, no color filter is applied
+  });
+  const resetFilters = () => {
+    setSearchText(''); // Clear search
+    setFilters({
+      gender: '', // Reset gender filter
+      color: '', // Reset color filter
+    });
+  };
 
-  // Fetch available pets from API
+  // Fetch available pets from API and set the state
   const fetchAvailablePets = async () => {
     try {
       const response = await fetch(
-        'https://pawsibilities-api.onrender.com/api/pets',
+        `https://pawsibilities-api.onrender.com/api/pets`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -65,7 +85,7 @@ export default function AvailablePets() {
     }
   };
 
-  // Fetch owner's name by owner ID
+  // Fetch owner's name by owner ID and set the state
   const fetchOwnerDetails = async (ownerId: string) => {
     try {
       const response = await fetch(
@@ -83,33 +103,64 @@ export default function AvailablePets() {
     }
   };
 
+  // Fetch available pets and owner details on component mount
   useEffect(() => {
     setLoading(true);
     fetchAvailablePets();
   }, []);
 
+  // Handle card press to show pet details and owner name
   const handleCardPress = (pet: Pet) => {
     setSelectedPet(pet);
     fetchOwnerDetails(pet.owner); // Fetch the owner's name
   };
 
+  // Close the modal
   const closeModal = () => {
     setSelectedPet(null);
     setSelectedPetOwner(null);
   };
 
-  // Toggle favorite status
-  const toggleFavorite = (petId: string) => {
-    setFavorites((prevFavorites) =>
-      prevFavorites.includes(petId)
-        ? prevFavorites.filter((id) => id !== petId)
-        : [...prevFavorites, petId],
-    );
+  // Add pet to favorite list and update the backend
+  const toggleFavorite = async (petId: string) => {
+    if (!userId) {
+      alert('User not logged in!');
+      return;
+    }
+
+    const updatedFavorites = favorites.includes(petId)
+      ? favorites.filter((id) => id !== petId)
+      : [...favorites, petId];
+
+    setFavorites(updatedFavorites); // Update local state immediately
+
+    try {
+      const response = await fetch(
+        `https://pawsibilities-api.onrender.com/api/pet/${petId}/favorite`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update favorites');
+      }
+
+      const data = await response.json();
+      console.log('Favorite status updated on backend:', data);
+      Alert.alert('Success', 'Favorite status updated successfully');
+    } catch (error) {
+      console.error('Error updating favorite status:', error);
+      console.log(`${petId} and ${userId}`);
+      setFavorites(favorites); // Revert local state if the backend fails
+    }
   };
 
   // Handle Interest in Pet
   const handleInterest = async (petId: string, paramUserId: string | null) => {
-    const userId = paramUserId; 
+    const userId = paramUserId;
 
     try {
       const response = await fetch(
@@ -118,13 +169,12 @@ export default function AvailablePets() {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
-        }
+        },
       );
 
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
-          
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
@@ -136,20 +186,35 @@ export default function AvailablePets() {
     }
   };
 
-  // Filter pets based on search text
+  // Filter pets based on search text and filters
   useEffect(() => {
+    let filtered = pets;
+
     if (searchText) {
-      const filtered = pets.filter(
+      filtered = filtered.filter(
         (pet) =>
           pet.breed.toLowerCase().includes(searchText.toLowerCase()) ||
           pet.species.toLowerCase().includes(searchText.toLowerCase()),
       );
-      setFilteredPets(filtered);
-    } else {
-      setFilteredPets(pets);
     }
-  }, [searchText, pets]);
 
+    if (filters.gender) {
+      filtered = filtered.filter((pet) =>
+        pet.gender.toLowerCase().match(filters.gender.toLowerCase()),
+      );
+    }
+
+    if (filters.color) {
+      filtered = filtered.filter((pet) =>
+        pet.color.toLowerCase().match(filters.color.toLowerCase()),
+      );
+    }
+
+    console.log('Filtered pets:', filtered); // Check the filtered pets
+    setFilteredPets(filtered);
+  }, [searchText, pets, filters]);
+
+  // Render each pet item in the FlatList
   const renderPetItem = ({ item }: { item: Pet }) => (
     <TouchableOpacity
       onPress={() => handleCardPress(item)}
@@ -183,6 +248,39 @@ export default function AvailablePets() {
         value={searchText}
         onChangeText={(text) => setSearchText(text)}
       />
+
+      {/* Filters: Gender, Color, Size in the same row */}
+      <View style={styles.filteredrow}>
+        <Picker
+          selectedValue={filters.gender}
+          style={styles.picker}
+          onValueChange={(value) => {
+            setFilters((prevFilters) => ({ ...prevFilters, gender: value }));
+          }}
+        >
+          <Picker.Item label="All Genders" value="" />
+          <Picker.Item label="Male" value="Male" />
+          <Picker.Item label="Female" value="Female" />
+        </Picker>
+
+        <Picker
+          selectedValue={filters.color}
+          style={styles.picker}
+          onValueChange={(value) => {
+            setFilters({ ...filters, color: value });
+          }}
+        >
+          <Picker.Item label="All Colors" value="" />
+          <Picker.Item label="White" value="White" />
+          <Picker.Item label="Black" value="Black" />
+          <Picker.Item label="Brown" value="Brown" />
+          <Picker.Item label="Gray" value="Gray" />
+        </Picker>
+      </View>
+      {/* Reset Filters Button */}
+      <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
+        <Text style={styles.resetButtonText}>Reset Filters</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={filteredPets}
@@ -239,7 +337,9 @@ export default function AvailablePets() {
 
               {/* "I'm Interested" Button */}
               <TouchableOpacity
-                onPress={() => handleInterest(selectedPet._id, userId as string | null)}
+                onPress={() =>
+                  handleInterest(selectedPet._id, userId as string | null)
+                }
                 style={styles.interestButton}
               >
                 <Text style={styles.interestButtonText}>I'm Interested</Text>
@@ -326,14 +426,27 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    width: '80%',
-    maxWidth: '90%',
+    width: '90%', // Adjust to fit screen size better
+    maxWidth: '100%',
   },
+
   favoriteButton: {
     position: 'absolute',
     top: 15,
     right: 15,
     zIndex: 1,
+  },
+  resetButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f44336', // Red color for reset
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   modalImage: {
     width: 150,
@@ -371,5 +484,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  filteredrow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 0,
+  },
+  picker: {
+    height: 25,
+    width: '48%',
+    marginBottom: 0,
+    borderRadius: 8, // Optional: add a border-radius for smoother edges
+    backgroundColor: '#f1f1f1', // Optional: light background for picker
   },
 });

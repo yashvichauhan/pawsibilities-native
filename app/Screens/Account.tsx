@@ -1,9 +1,14 @@
+/**
+ * Account screen for the user to view and edit their profile
+ */
 import { StyleSheet } from 'react-native';
-
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import MyProfile from './MyProfile';
 
+/**
+ * Account screen for the user to view and edit their profile
+ */
 export default function TabAccountScreen() {
   return (
     <View style={styles.container}>

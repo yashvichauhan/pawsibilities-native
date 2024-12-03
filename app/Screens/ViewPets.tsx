@@ -1,3 +1,6 @@
+/**
+ * View Pets Screen for Pet Owners to view their posted pets
+ */
 import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
@@ -27,15 +30,12 @@ export default function ViewPets() {
   const [adopters, setAdopters] = useState<Adopter[]>([]); // Explicitly type the adopters state
   const { userId } = useTabBarVisibility();
 
-  // Fetch user pets from API
+  /**
+   * Fetch pets posted by the logged-in user
+   *
+   */
   const fetchUserPets = async () => {
     try {
-      // const userID = await AsyncStorage.getItem('userID');
-      // if (!userID) {
-      //   console.log('No userID found in storage');
-      //   return;
-      // }
-
       const response = await fetch(
         'https://pawsibilities-api.onrender.com/api/user/' + userId + '/pets',
         {
@@ -44,7 +44,7 @@ export default function ViewPets() {
         },
       );
       console.log(
-        'https://pawsibilities-api.onrender.com/api/user/' + userId + '/pets',
+        `https://pawsibilities-api.onrender.com/api/user/${userId}/pets`,
       );
 
       const petsData = await response.json();
@@ -57,6 +57,10 @@ export default function ViewPets() {
     }
   };
 
+  /**
+   * Delete a pet
+   * @param petId
+   */
   const handleDelete = async (petId: string) => {
     try {
       const response = await fetch(
@@ -81,7 +85,10 @@ export default function ViewPets() {
     }
   };
 
-  // Fetch interested adopters for a pet
+  /**
+   * Fetch interested adopters for a pet
+   * @param petId
+   */
   const handleViewInterestedAdopters = async (petId: string) => {
     try {
       const response = await fetch(
@@ -89,13 +96,13 @@ export default function ViewPets() {
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       );
-  
+
       if (response.ok) {
         const adoptersData = await response.json();
         setAdopters(adoptersData);
-        setShowAdoptersModal(true);  // Show the modal with adopters
+        setShowAdoptersModal(true); // Show the modal with adopters
       } else {
         Alert.alert('Error', 'Failed to fetch interested adopters');
       }
@@ -115,15 +122,19 @@ export default function ViewPets() {
       >
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Interested Adopters</Text>
-  
+
           {adopters.length === 0 ? (
-            <Text style={styles.noAdoptersText}>No interested adopters found</Text>
+            <Text style={styles.noAdoptersText}>
+              No interested adopters found
+            </Text>
           ) : (
             <FlatList
               data={adopters}
               renderItem={({ item }) => (
                 <View style={styles.adopterCard}>
-                  <Text style={styles.adopterText}>Username: {item.username}</Text>
+                  <Text style={styles.adopterText}>
+                    Username: {item.username}
+                  </Text>
                   <Text style={styles.adopterText}>Email: {item.email}</Text>
                 </View>
               )}
@@ -131,7 +142,7 @@ export default function ViewPets() {
               contentContainerStyle={styles.listContainer}
             />
           )}
-  
+
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setShowAdoptersModal(false)}
@@ -143,6 +154,11 @@ export default function ViewPets() {
     );
   };
 
+  /**
+   * Update pet availability status (toggle between available and adopted)
+   * @param petId
+   * @param currentAvailability
+   */
   const handleToggleAvailability = async (
     petId: string,
     currentAvailability: boolean,
@@ -234,9 +250,8 @@ export default function ViewPets() {
             style={[styles.button, styles.deleteButton]}
             onPress={() => handleDelete(item._id)}
           >
-          <Text style={styles.buttonText}>Delete</Text>
+            <Text style={styles.buttonText}>Delete</Text>
           </TouchableOpacity>
-          
         </View>
       </View>
     </View>
@@ -372,12 +387,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   interestedButton: {
-    backgroundColor: '#6200ee'
+    backgroundColor: '#6200ee',
   },
   noAdoptersText: {
     fontSize: 18,
     color: '#777',
     textAlign: 'center',
     marginVertical: 20,
-  }
+  },
 });
