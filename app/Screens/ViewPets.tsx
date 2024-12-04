@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
+  TextInput,
   View,
   Image,
   FlatList,
@@ -15,6 +16,8 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTabBarVisibility } from '@/context/TabBarContext';
+import emailjs from '@emailjs/browser';
+import axios from 'axios';
 
 // Define the type for Adopter
 interface Adopter {
@@ -28,7 +31,18 @@ export default function ViewPets() {
   const [loading, setLoading] = useState(true);
   const [showAdoptersModal, setShowAdoptersModal] = useState(false);
   const [adopters, setAdopters] = useState<Adopter[]>([]); // Explicitly type the adopters state
-  const { userId } = useTabBarVisibility();
+  const { userId, username } = useTabBarVisibility();
+
+   // State to track input values for each adopter (Pet Owner -> Pet Adopter communication)
+   const [inputValues, setInputValues] = React.useState<Record<string, string>>({});
+
+   // Function to handle input changes For Pet Owner -> Pet Adopter communication
+   const handleInputChange = (id: any, value: any) => {
+     setInputValues((prevState) => ({
+       ...prevState,
+       [id]: value,
+     }));
+   };
 
   /**
    * Fetch pets posted by the logged-in user
@@ -112,8 +126,42 @@ export default function ViewPets() {
     }
   };
 
+   /**
+   * Allow Pet Owner to contact interested Pet Adopters
+   * @param adopterEmail
+   * @param adopterName
+   * @param ownerName
+   * @param msg
+   */
+  const handleContactAdopter = async (adopterEmail: string, adopterName: string, ownerName: string | null, msg: string, ) => {
+
+    try {
+      const payload = {
+          service_id: 'service_ef1x93d',
+          template_id: 'template_w1zmtnv',
+          user_id: '1Ffx3G6iIfEiMMG6-', //this includes a dash that is part of my key
+          accessToken: 'NVYlA1xYTnF_H56l2jNK_',
+          template_params: {
+              to_name: adopterName,
+              from_name: ownerName,
+              message: msg,
+              to_email: adopterEmail
+          }
+      };
+      const headers = { "Content-Type": "application/json" };
+      const { status } = await axios.post('https://api.emailjs.com/api/v1.0/email/send', payload, { headers });
+      if(status === 200) {
+        Alert.alert('Success', 'Email sent successfully');
+      }
+  } catch (error) {
+    Alert.alert('Error', error as any);
+   }
+
+  };
+
   // Render the modal with adopters' details
   const renderAdoptersModal = () => {
+    
     return (
       <Modal
         visible={showAdoptersModal}
@@ -136,6 +184,21 @@ export default function ViewPets() {
                     Username: {item.username}
                   </Text>
                   <Text style={styles.adopterText}>Email: {item.email}</Text>
+
+                   {/* Text input for message */}
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Type your message here"
+                  value={inputValues[item._id] || ""}
+                  onChangeText={(value) => handleInputChange(item._id, value)}
+                />
+
+                  <TouchableOpacity
+                      style={styles.contactButton}
+                      onPress={() => handleContactAdopter(item.email, item.username, username, inputValues[item._id] || "")}
+                    >
+                      <Text style={styles.buttonText}>Send Message</Text>
+                    </TouchableOpacity>
                 </View>
               )}
               keyExtractor={(item) => item._id}
@@ -395,4 +458,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
   },
+  contactButton: {
+    backgroundColor: '#4caf50',
+    paddingVertical: 8,
+    marginTop: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  textInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    marginTop: 10
+  }
 });
