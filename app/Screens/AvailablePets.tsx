@@ -498,8 +498,6 @@ const styles = StyleSheet.create({
     borderRadius: 8, // Optional: add a border-radius for smoother edges
     backgroundColor: '#f1f1f1', // Optional: light background for picker
   },
-<<<<<<< Updated upstream
-=======
   filterButton: {
     backgroundColor: '#3498db',
     padding: 12,
@@ -512,5 +510,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
->>>>>>> Stashed changes
 });
