@@ -35,6 +35,7 @@ export default function PostNewPet() {
   const [available, setAvailable] = useState(true);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [labels, setLabels] = useState<string[]>([]);
+  const [address, setAddress] = useState('');
 
   // Reset the form when the component mounts
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function PostNewPet() {
     setDescription('');
     setImageUri(null);
     setLabels([]);
+    setAddress('');
   };
 
   /**
@@ -270,6 +272,30 @@ export default function PostNewPet() {
     }
   };
 
+  // Function to handle fetching latitude and longitude using the address
+  const fetchCoordinates = async (address: string) => {
+    const encodedAddress = encodeURIComponent(address);
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=AIzaSyBxXioMJUvVMDtH41PZvLPuuampjxftOyg`;
+
+    try {
+      const response = await fetch(geocodeUrl);
+      const data = await response.json();
+
+      if (data.status === 'OK') {
+        const location = data.results[0].geometry.location;
+        return {
+          latitude: location.lat,
+          longitude: location.lng,
+        };
+      } else {
+        throw new Error('Unable to fetch coordinates');
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      throw error;
+    }
+  };
+
   /**
    * Submit the form data to the backend
    * @returns void
@@ -290,11 +316,19 @@ export default function PostNewPet() {
 
     try {
       const owner = userId;
-      console.log('Owner ID:', owner);
 
       if (!owner) {
         Alert.alert('Error', 'User ID not found. Please log in.');
         return;
+      }
+
+      const { latitude, longitude } = await fetchCoordinates(address);
+
+      if (!longitude || !latitude) {
+        Alert.alert(
+          'Error',
+          'Unable to fetch coordinates for the provided address. Please check and correct the address.',
+        );
       }
 
       const petData = {
@@ -308,6 +342,8 @@ export default function PostNewPet() {
         description,
         available,
         owner,
+        longitude,
+        latitude,
       };
 
       const formData = new FormData();
@@ -415,6 +451,12 @@ export default function PostNewPet() {
         placeholder="Description"
         value={description}
         onChangeText={setDescription}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Enter Address"
+        value={address}
+        onChangeText={setAddress}
       />
 
       {/* Gender and Size Fields */}
@@ -560,5 +602,10 @@ const styles = StyleSheet.create({
   },
   labelsContainer: {
     marginTop: 16,
+  },
+  coordinatesText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: 'green',
   },
 });
