@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   resetButton: {
-    marginTop: 10,
+    marginTop: 5,
     padding: 10,
     backgroundColor: '#f44336', // Red color for reset
     borderRadius: 8,
@@ -498,4 +498,19 @@ const styles = StyleSheet.create({
     borderRadius: 8, // Optional: add a border-radius for smoother edges
     backgroundColor: '#f1f1f1', // Optional: light background for picker
   },
+<<<<<<< Updated upstream
+=======
+  filterButton: {
+    backgroundColor: '#3498db',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 5,
+    marginBottom: 5,
+  },
+  filterButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+>>>>>>> Stashed changes
 });
