@@ -24,11 +24,18 @@ export default function TabLayout() {
 
   const { showTabBar, role } = useTabBarVisibility(); // Use context to get the tab visibility state
 
+  const { setShowTabBar, setRole, setUsername, setUserId } =
+    useTabBarVisibility();
+
   const navigation = useNavigation();
 
   const handleLogout = async () => {
     try {
       await axios.get('https://pawsibilities-api.onrender.com/api/signout');
+      setShowTabBar(false);
+      setRole(null);
+      setUsername(null);
+      setUserId(null);
       navigation.navigate('Login' as never);
     } catch (error) {
       console.error('Logout failed:', error);
