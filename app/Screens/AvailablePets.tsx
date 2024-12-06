@@ -18,6 +18,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useTabBarVisibility } from '@/context/TabBarContext';
+import * as Location from 'expo-location';
 
 // Define the Pet and Owner interfaces
 interface Pet {
@@ -35,6 +36,13 @@ interface Pet {
   owner: string; // Owner ID
   interestedAdopters: string[]; // Interested Adopters;
   isFavorite: boolean;
+  location:
+    | {
+        longitude: number;
+        latitude: number;
+      }
+    | null
+    | undefined;
 }
 
 interface Owner {
@@ -55,12 +63,19 @@ export default function AvailablePets() {
     gender: '', // Initially, no gender filter is applied
     color: '', // Initially, no color filter is applied
   });
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [isFilteredLocation, setIsFilteredLocation] = useState(false);
+
   const resetFilters = () => {
     setSearchText(''); // Clear search
     setFilters({
       gender: '', // Reset gender filter
       color: '', // Reset color filter
     });
+    setIsFilteredLocation(false);
   };
 
   // Fetch available pets from API and set the state
@@ -77,7 +92,7 @@ export default function AvailablePets() {
       const petsData = await response.json();
       setPets(petsData);
       setFilteredPets(petsData);
-      console.log('Fetched pets:', petsData);
+      // console.log('Fetched pets:', petsData);
     } catch (error) {
       console.error('Error fetching available pets:', error);
     } finally {
@@ -97,10 +112,73 @@ export default function AvailablePets() {
       );
       const ownerData = await response.json();
       setSelectedPetOwner({ name: ownerData.username });
-      console.log('Fetched owner details:', ownerData);
     } catch (error) {
       console.error('Error fetching owner details:', error);
     }
+  };
+
+  const requestLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Denied',
+        'Enable location permissions to filter nearby pets.',
+      );
+      return;
+    }
+
+    try {
+      const { coords } = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+      // console.log('GOT The cooords-----------------------> ', coords);
+      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
+    } catch (error) {
+      console.error('Error fetching location:', error);
+      Alert.alert('Error', 'Unable to fetch location. Please try again.');
+    }
+  };
+
+  const filterNearbyPets = () => {
+    if (!location) {
+      Alert.alert('Error', 'Location is not available.');
+      return;
+    }
+
+    const nearbyPets = pets.filter((pet) => {
+      if (pet.location) {
+        const distance = calculateDistance(
+          location.latitude,
+          location.longitude,
+          pet.location.latitude,
+          pet.location.longitude,
+        );
+        return distance <= 50; // 50 km radius
+      }
+      return false;
+    });
+
+    setFilteredPets(nearbyPets);
+    setIsFilteredLocation(true);
+  };
+
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
   };
 
   // Fetch available pets and owner details on component mount
@@ -149,11 +227,10 @@ export default function AvailablePets() {
       }
 
       const data = await response.json();
-      console.log('Favorite status updated on backend:', data);
       Alert.alert('Success', 'Favorite status updated successfully');
     } catch (error) {
       console.error('Error updating favorite status:', error);
-      console.log(`${petId} and ${userId}`);
+      // console.log(`${petId} and ${userId}`);
       setFavorites(favorites); // Revert local state if the backend fails
     }
   };
@@ -210,7 +287,7 @@ export default function AvailablePets() {
       );
     }
 
-    console.log('Filtered pets:', filtered); // Check the filtered pets
+    // console.log('Filtered pets:', filtered); // Check the filtered pets
     setFilteredPets(filtered);
   }, [searchText, pets, filters]);
 
@@ -277,6 +354,14 @@ export default function AvailablePets() {
           <Picker.Item label="Gray" value="Gray" />
         </Picker>
       </View>
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={() => {
+          requestLocation().then(filterNearbyPets);
+        }}
+      >
+        <Text style={styles.filterButtonText}>Show Nearby Pets</Text>
+      </TouchableOpacity>
       {/* Reset Filters Button */}
       <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
         <Text style={styles.resetButtonText}>Reset Filters</Text>
@@ -497,5 +582,16 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     borderRadius: 8, // Optional: add a border-radius for smoother edges
     backgroundColor: '#f1f1f1', // Optional: light background for picker
+  },
+  filterButton: {
+    backgroundColor: '#3498db',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  filterButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
