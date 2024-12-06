@@ -275,7 +275,8 @@ export default function PostNewPet() {
   // Function to handle fetching latitude and longitude using the address
   const fetchCoordinates = async (address: string) => {
     const encodedAddress = encodeURIComponent(address);
-    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=AIzaSyBxXioMJUvVMDtH41PZvLPuuampjxftOyg`;
+    const key = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${key}`;
 
     try {
       const response = await fetch(geocodeUrl);
