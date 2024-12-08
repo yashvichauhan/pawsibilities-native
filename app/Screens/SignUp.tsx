@@ -31,9 +31,11 @@ export default function SignUp({ path }: { path: string }) {
     );
 
     // Disable swipe back gesture on iOS
-    navigation.setOptions({
-      gestureEnabled: false, // Disable back navigation via swipe gesture on iOS
-    });
+    if (navigation && navigation.setOptions) {
+      navigation.setOptions({
+        gestureEnabled: false, // Disable back navigation via swipe gesture on iOS
+      });
+    }
 
     // Cleanup the event listener on component unmount
     return () => backHandler.remove();
@@ -130,6 +132,7 @@ export default function SignUp({ path }: { path: string }) {
           placeholder="Enter your username"
           value={username}
           onChangeText={setUsername}
+          testID="username-input"
         />
 
         <TextInput
@@ -138,6 +141,7 @@ export default function SignUp({ path }: { path: string }) {
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
+          testID="email-input"
         />
 
         <TextInput
@@ -146,6 +150,7 @@ export default function SignUp({ path }: { path: string }) {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          testID="password-input"
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
