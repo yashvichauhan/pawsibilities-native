@@ -1,3 +1,4 @@
+// Objective: Define the User interface
 interface User {
   _id: string;
   username: string;
